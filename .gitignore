@@ -1,0 +1,20 @@
+#ignore the Setting Folder
+.settings/
+
+#ignore the build output folder
+Debug/
+Release/
+
+#ignore the debug launch 
+*.launch
+
+#ignore the Excel file
+bin_to_hex.xlsx
+~$bin_to_hex.xlsx
+
+#ignore example files
+example*
+
+
+
+
