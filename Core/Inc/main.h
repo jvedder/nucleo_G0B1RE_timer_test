@@ -79,17 +79,27 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
-#define CCR1_RISE	(    0)
-#define CCR2_RISE	( 8000)
-#define CCR3_RISE	(16000)
-#define CCR4_RISE	(24000)
-#define CCR1_FALL	(CCR1_RISE + 3200)
-#define CCR2_FALL	(CCR2_RISE + 3200)
-#define CCR3_FALL	(CCR3_RISE + 3200)
-#define CCR4_FALL	(CCR4_RISE + 3200)
+#define TIM1_CH1_GPIO_Port GPIOA
+#define TIM1_CH1_Pin  GPIO_PIN_8
+#define TIM1_CH2_GPIO_Port GPIOA
+#define TIM1_CH2_Pin  GPIO_PIN_9
+#define TIM1_CH3_GPIO_Port GPIOB
+#define TIM1_CH3_Pin  GPIO_PIN_6
+#define TIM1_CH4_GPIO_Port GPIOC
+#define TIM1_CH4_Pin  GPIO_PIN_11
 
-#define IS_GPIO_PIN_HIGH(PORT, BIT)  ( ((PORT)->IDR & (0x1UL << (BIT))) == (0x1UL << (BIT)) )
-#define IS_GPIO_PIN_LOW(PORT, BIT)   ( ((PORT)->IDR & (0x1UL << (BIT))) == (0x0UL) )
+
+#define TIM1_CCR1_RISE	(    0)
+#define TIM1_CCR2_RISE	( 8000)
+#define TIM1_CCR3_RISE	(16000)
+#define TIM1_CCR4_RISE	(24000)
+#define TIM1_CCR1_FALL	(TIM1_CCR1_RISE + 3200)
+#define TIM1_CCR2_FALL	(TIM1_CCR2_RISE + 3200)
+#define TIM1_CCR3_FALL	(TIM1_CCR3_RISE + 3200)
+#define TIM1_CCR4_FALL	(TIM1_CCR4_RISE + 3200)
+
+#define IS_GPIO_PIN_HIGH(PORT, PIN)  ( ((PORT)->IDR & (PIN)) == (PIN) )
+#define IS_GPIO_PIN_LOW(PORT, PIN)   ( ((PORT)->IDR & (PIN)) == (0x0UL) )
 
 void show_regs(uint32_t base, uint32_t len);
 

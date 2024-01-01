@@ -147,86 +147,90 @@ void TIM1_CC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_CC_IRQn 0 */
 
+  /* If CH1 caused the interrupt */
   if (TIM1->SR & TIM_SR_CC1IF)
   {
 	  /* toggle the timer value */
-	  if (TIM1->CCR1 == CCR1_RISE)
+	  if (TIM1->CCR1 == TIM1_CCR1_RISE)
 	  {
 		  /* set up the falling edge time */
-		  TIM1->CCR1 = CCR1_FALL;
+		  TIM1->CCR1 = TIM1_CCR1_FALL;
 
-		  /* fault if GPIO PA8 did not rise */
-		  if (IS_GPIO_PIN_LOW(GPIOA, 8)) polarity_fault = 1;
+		  /* fault if GPIO pin did not rise */
+		  if (IS_GPIO_PIN_LOW(TIM1_CH1_GPIO_Port, TIM1_CH1_Pin)) polarity_fault |= 0x01;
 	  }
 	  else
 	  {
 		  /* set up the rising edge time */
-		  TIM1->CCR1 = CCR1_RISE;
+		  TIM1->CCR1 = TIM1_CCR1_RISE;
 
-		  /* fault if GPIO PA8 did not fall */
-		  if (IS_GPIO_PIN_HIGH(GPIOA, 8)) polarity_fault = 1;
+		  /* fault if GPIO pin did not fall */
+		  if (IS_GPIO_PIN_HIGH(TIM1_CH1_GPIO_Port, TIM1_CH1_Pin)) polarity_fault |= 0x10;
 	  }
 	  /* clear CC1IF */
 	  TIM1->SR = ~(TIM_SR_CC1IF);
   }
 
+  /* If CH2 caused the interrupt */
   if (TIM1->SR & TIM_SR_CC2IF)
   {
 	  /* toggle the timer value */
-	  if (TIM1->CCR2 == CCR2_RISE)
+	  if (TIM1->CCR2 == TIM1_CCR2_RISE)
 	  {
 		  /* set up the falling edge time */
-		  TIM1->CCR2 = CCR2_FALL;
+		  TIM1->CCR2 = TIM1_CCR2_FALL;
 
-		  /* fault if GPIO PA9 did not rise */
-		  if (IS_GPIO_PIN_LOW(GPIOA, 9)) polarity_fault = 2;
+		  /* fault if GPIO pin did not rise */
+		  if (IS_GPIO_PIN_LOW(TIM1_CH2_GPIO_Port, TIM1_CH2_Pin)) polarity_fault |= 0x02;
 	  }
 	  else
 	  {
 		  /* set up the rising edge time */
-		  TIM1->CCR2 = CCR2_RISE;
+		  TIM1->CCR2 = TIM1_CCR2_RISE;
 
-		  /* fault if GPIO PA9 did not fall */
-		  if (IS_GPIO_PIN_HIGH(GPIOA, 9)) polarity_fault = 2;
+		  /* fault if GPIO pin did not fall */
+		  if (IS_GPIO_PIN_HIGH(TIM1_CH2_GPIO_Port, TIM1_CH2_Pin)) polarity_fault |= 0x20;
 	  }
 	  /* clear CC2IF */
 	  TIM1->SR = ~(TIM_SR_CC2IF);
   }
 
+  /* If CH3 caused the interrupt */
   if (TIM1->SR & TIM_SR_CC3IF)
   {
 	  /* toggle the timer value */
-	  if (TIM1->CCR3 == CCR3_RISE)
+	  if (TIM1->CCR3 == TIM1_CCR3_RISE)
 	  {
 		  /* set up the falling edge time */
-		  TIM1->CCR3 = CCR3_FALL;
+		  TIM1->CCR3 = TIM1_CCR3_FALL;
 
-		  /* fault if GPIO PB6 did not rise */
-		  if (IS_GPIO_PIN_LOW(GPIOB, 6)) polarity_fault = 3;
+		  /* fault if GPIO pin did not rise */
+		  if (IS_GPIO_PIN_LOW(TIM1_CH3_GPIO_Port, TIM1_CH3_Pin)) polarity_fault |= 0x04;
 	  }
 	  else
 	  {
 		  /* set up the rising edge time */
-		  TIM1->CCR3 = CCR3_RISE;
+		  TIM1->CCR3 = TIM1_CCR3_RISE;
 
-		  /* fault if GPIO PB6 did not fall */
-		  if (IS_GPIO_PIN_HIGH(GPIOB, 6)) polarity_fault = 3;
+		  /* fault if GPIO pin did not fall */
+		  if (IS_GPIO_PIN_HIGH(TIM1_CH3_GPIO_Port, TIM1_CH3_Pin)) polarity_fault |= 0x40;
 	  }
 	  /* clear CC3IF */
 	  TIM1->SR = ~(TIM_SR_CC3IF);
   }
 
+  /* If CH4 caused the interrupt */
   if (TIM1->SR & TIM_SR_CC4IF)
   {
 	  /* Toggle the timer value */
 	  /* toggle the timer value */
-	  if (TIM1->CCR4 == CCR4_RISE)
+	  if (TIM1->CCR4 == TIM1_CCR4_RISE)
 	  {
 		  /* set up the falling edge time */
-		  TIM1->CCR4 = CCR4_FALL;
+		  TIM1->CCR4 = TIM1_CCR4_FALL;
 
-		  /* fault if GPIO PC11 did not rise */
-		  if (IS_GPIO_PIN_LOW(GPIOC, 11)) polarity_fault = 4;
+		  /* fault if GPIO pin did not rise */
+		  if (IS_GPIO_PIN_LOW(TIM1_CH4_GPIO_Port, TIM1_CH4_Pin)) polarity_fault |= 0x08;
 
 		  /* DEBUG: record how long this took */
 		  ccr4_rise_isr_time = TIM1->CNT;
@@ -234,10 +238,10 @@ void TIM1_CC_IRQHandler(void)
 	  else
 	  {
 		  /* set up the rising edge time */
-		  TIM1->CCR4 = CCR4_RISE;
+		  TIM1->CCR4 = TIM1_CCR4_RISE;
 
-		  /* fault if GPIO PC11 did not fall */
-		  if (IS_GPIO_PIN_HIGH(GPIOC, 11)) polarity_fault = 4;
+		  /* fault if GPIO pin did not fall */
+		  if (IS_GPIO_PIN_HIGH(TIM1_CH4_GPIO_Port, TIM1_CH4_Pin)) polarity_fault |= 0x80;
 
 		  /* DEBUG: record how long this took */
 		  ccr4_fall_isr_time = TIM1->CNT;

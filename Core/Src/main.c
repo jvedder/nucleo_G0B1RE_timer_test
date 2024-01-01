@@ -103,10 +103,10 @@ int main(void)
    */
 
   /* Set the initial strobe values */
-  TIM1->CCR1 = CCR1_RISE;
-  TIM1->CCR2 = CCR2_RISE;
-  TIM1->CCR3 = CCR3_RISE;
-  TIM1->CCR4 = CCR4_RISE;
+  TIM1->CCR1 = TIM1_CCR1_RISE;
+  TIM1->CCR2 = TIM1_CCR2_RISE;
+  TIM1->CCR3 = TIM1_CCR3_RISE;
+  TIM1->CCR4 = TIM1_CCR4_RISE;
   /* Enable only CC1 thru CC4  interrupts  */
   TIM1->DIER =  (TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE | TIM_DIER_CC4IE);
   /* Enable only CC thru CC4 outputs */
@@ -120,6 +120,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint32_t max_isr_rise =0;
+  uint32_t max_isr_fall =0;
+  uint32_t temp;
   while (1)
   {
 	  /* light LED if faulted */
@@ -127,6 +130,15 @@ int main(void)
 	  {
 		  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 	  }
+
+	  /* Note: ccr4_rise_isr_time and ccr4_fall_isr_time are volatile, so we
+	   * need to do an atomic read by taking a snapshot in temp.
+	   */
+	  temp = ccr4_rise_isr_time;
+	  if ( temp > max_isr_rise) max_isr_rise = temp;
+
+	  temp = ccr4_fall_isr_time;
+	  if ( temp > max_isr_fall) max_isr_fall = temp;
 
 #if 1
 	  /* if user button pressed */
@@ -136,7 +148,9 @@ int main(void)
 		  /* show TIM1 register values */
 		  //printf("TIM1\r\n");
 		  //show_regs(TIM1_BASE, 0x68);
-		  printf("isr time  %lX  %lX\r\n", ccr4_rise_isr_time, ccr4_fall_isr_time);
+		  printf("max isr times  %4lX  %4lX\r\n", max_isr_rise, max_isr_fall);
+		  printf("faults %2lX\r\n", polarity_fault);
+		  printf("\r\n");
 
 		  HAL_Delay(50);
 		  /* wait for button release */
