@@ -94,13 +94,23 @@ int main(void)
 
   // show_regs(TIM1_BASE, 0x68);
 
-  /* Enable Interrupts and Start TIM1 */
+  /*
+   *  Finish TIM1 set-up
+   */
+
+  /* Set the strobe values */
   TIM1->CCR1 = CCR1_LOW;
   TIM1->CCR2 = CCR2_LOW;
   TIM1->CCR3 = CCR3_LOW;
   TIM1->CCR4 = CCR4_LOW;
-  TIM1->DIER = 0x000E;	/* Enable only CC1IE, CC2IE, CC3IE*/
-  TIM1->CCR1 = 0x0001;  /* start TIM1 */
+  /* Enable only CC1, CC2,  and CC3 interrupts  */
+  TIM1->DIER =  (TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE);
+  /* Enable only CC1, CC2, CC3, and CC4 outputs */
+  TIM1->CCER = (TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E);
+  /* Set Main Output Enable (MOE) */
+  TIM1->BDTR |= TIM_BDTR_MOE;
+  /* Set Counter Enable -> start TIM1 */
+  TIM1->CR1  |= TIM_CR1_CEN;
 
   /* USER CODE END 2 */
 
@@ -108,6 +118,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+#if 1
+	  /* if user button press */
+	  uint32_t btn = HAL_GPIO_ReadPin(BTN_USER_GPIO_Port, BTN_USER_Pin);
+	  if (btn == 0)
+	  {
+		  /* show TIM1 register values */
+		  printf("TIM1\r\n");
+		  show_regs(TIM1_BASE, 0x68);
+		  HAL_Delay(50);
+		  /* wait for button release */
+		  while (btn == 0)
+		  {
+			  btn = HAL_GPIO_ReadPin(BTN_USER_GPIO_Port, BTN_USER_Pin);
+		  }
+	  }
+#endif
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -159,7 +185,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCO2DIV_1);
+  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCO2DIV_64);
 }
 
 /* USER CODE BEGIN 4 */
