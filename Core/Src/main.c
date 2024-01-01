@@ -47,6 +47,10 @@
 
 /* USER CODE BEGIN PV */
 
+volatile uint32_t ccr4_rise_isr_time = 0;
+volatile uint32_t ccr4_fall_isr_time = 0;
+volatile uint32_t polarity_fault = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -98,14 +102,14 @@ int main(void)
    *  Finish TIM1 set-up
    */
 
-  /* Set the strobe values */
-  TIM1->CCR1 = CCR1_LOW;
-  TIM1->CCR2 = CCR2_LOW;
-  TIM1->CCR3 = CCR3_LOW;
-  TIM1->CCR4 = CCR4_LOW;
-  /* Enable only CC1, CC2,  and CC3 interrupts  */
-  TIM1->DIER =  (TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE);
-  /* Enable only CC1, CC2, CC3, and CC4 outputs */
+  /* Set the initial strobe values */
+  TIM1->CCR1 = CCR1_RISE;
+  TIM1->CCR2 = CCR2_RISE;
+  TIM1->CCR3 = CCR3_RISE;
+  TIM1->CCR4 = CCR4_RISE;
+  /* Enable only CC1 thru CC4  interrupts  */
+  TIM1->DIER =  (TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE | TIM_DIER_CC4IE);
+  /* Enable only CC thru CC4 outputs */
   TIM1->CCER = (TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E);
   /* Set Main Output Enable (MOE) */
   TIM1->BDTR |= TIM_BDTR_MOE;
@@ -118,14 +122,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  /* light LED if faulted */
+	  if (polarity_fault)
+	  {
+		  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+	  }
+
 #if 1
-	  /* if user button press */
+	  /* if user button pressed */
 	  uint32_t btn = HAL_GPIO_ReadPin(BTN_USER_GPIO_Port, BTN_USER_Pin);
 	  if (btn == 0)
 	  {
 		  /* show TIM1 register values */
-		  printf("TIM1\r\n");
-		  show_regs(TIM1_BASE, 0x68);
+		  //printf("TIM1\r\n");
+		  //show_regs(TIM1_BASE, 0x68);
+		  printf("isr time  %lX  %lX\r\n", ccr4_rise_isr_time, ccr4_fall_isr_time);
+
 		  HAL_Delay(50);
 		  /* wait for button release */
 		  while (btn == 0)

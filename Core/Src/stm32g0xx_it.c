@@ -149,37 +149,104 @@ void TIM1_CC_IRQHandler(void)
 
   if (TIM1->SR & TIM_SR_CC1IF)
   {
-	  /* Toggle the timer value */
-	  TIM1->CCR1 = (TIM1->CCR1 == CCR1_LOW) ? CCR1_HIGH : CCR1_LOW;
+	  /* toggle the timer value */
+	  if (TIM1->CCR1 == CCR1_RISE)
+	  {
+		  /* set up the falling edge time */
+		  TIM1->CCR1 = CCR1_FALL;
+
+		  /* fault if GPIO PA8 did not rise */
+		  if (IS_GPIO_PIN_LOW(GPIOA, 8)) polarity_fault = 1;
+	  }
+	  else
+	  {
+		  /* set up the rising edge time */
+		  TIM1->CCR1 = CCR1_RISE;
+
+		  /* fault if GPIO PA8 did not fall */
+		  if (IS_GPIO_PIN_HIGH(GPIOA, 8)) polarity_fault = 1;
+	  }
 	  /* clear CC1IF */
 	  TIM1->SR = ~(TIM_SR_CC1IF);
   }
 
   if (TIM1->SR & TIM_SR_CC2IF)
   {
-	  /* Toggle the timer value */
-	  TIM1->CCR2 = (TIM1->CCR2 == CCR2_LOW) ? CCR2_HIGH : CCR2_LOW;
+	  /* toggle the timer value */
+	  if (TIM1->CCR2 == CCR2_RISE)
+	  {
+		  /* set up the falling edge time */
+		  TIM1->CCR2 = CCR2_FALL;
+
+		  /* fault if GPIO PA9 did not rise */
+		  if (IS_GPIO_PIN_LOW(GPIOA, 9)) polarity_fault = 2;
+	  }
+	  else
+	  {
+		  /* set up the rising edge time */
+		  TIM1->CCR2 = CCR2_RISE;
+
+		  /* fault if GPIO PA9 did not fall */
+		  if (IS_GPIO_PIN_HIGH(GPIOA, 9)) polarity_fault = 2;
+	  }
 	  /* clear CC2IF */
 	  TIM1->SR = ~(TIM_SR_CC2IF);
   }
 
   if (TIM1->SR & TIM_SR_CC3IF)
   {
-	  /* Toggle the timer value */
-	  TIM1->CCR3 = (TIM1->CCR3 == CCR3_LOW) ? CCR3_HIGH : CCR3_LOW;
+	  /* toggle the timer value */
+	  if (TIM1->CCR3 == CCR3_RISE)
+	  {
+		  /* set up the falling edge time */
+		  TIM1->CCR3 = CCR3_FALL;
+
+		  /* fault if GPIO PB6 did not rise */
+		  if (IS_GPIO_PIN_LOW(GPIOB, 6)) polarity_fault = 3;
+	  }
+	  else
+	  {
+		  /* set up the rising edge time */
+		  TIM1->CCR3 = CCR3_RISE;
+
+		  /* fault if GPIO PB6 did not fall */
+		  if (IS_GPIO_PIN_HIGH(GPIOB, 6)) polarity_fault = 3;
+	  }
 	  /* clear CC3IF */
 	  TIM1->SR = ~(TIM_SR_CC3IF);
   }
 
-#if 0
   if (TIM1->SR & TIM_SR_CC4IF)
   {
 	  /* Toggle the timer value */
-	  TIM1->CCR4 = (TIM1->CCR4 == CCR4_LOW) ? CCR4_HIGH : CCR4_LOW;
+	  /* toggle the timer value */
+	  if (TIM1->CCR4 == CCR4_RISE)
+	  {
+		  /* set up the falling edge time */
+		  TIM1->CCR4 = CCR4_FALL;
+
+		  /* fault if GPIO PC11 did not rise */
+		  if (IS_GPIO_PIN_LOW(GPIOC, 11)) polarity_fault = 4;
+
+		  /* DEBUG: record how long this took */
+		  ccr4_rise_isr_time = TIM1->CNT;
+	  }
+	  else
+	  {
+		  /* set up the rising edge time */
+		  TIM1->CCR4 = CCR4_RISE;
+
+		  /* fault if GPIO PC11 did not fall */
+		  if (IS_GPIO_PIN_HIGH(GPIOC, 11)) polarity_fault = 4;
+
+		  /* DEBUG: record how long this took */
+		  ccr4_fall_isr_time = TIM1->CNT;
+	  }
+
 	  /* clear CC4IF */
 	  TIM1->SR = ~(TIM_SR_CC4IF);
   }
-#endif
+
 
   /* USER CODE END TIM1_CC_IRQn 0 */
   /* USER CODE BEGIN TIM1_CC_IRQn 1 */

@@ -37,6 +37,11 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
+extern volatile uint32_t ccr4_rise_isr_time;
+extern volatile uint32_t ccr4_fall_isr_time;
+
+extern volatile uint32_t polarity_fault;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -74,14 +79,17 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
-#define CCR1_LOW	(16000)
-#define CCR2_LOW	(32000)
-#define CCR3_LOW	(48000)
-#define CCR4_LOW	(32000)
-#define CCR1_HIGH	(CCR1_LOW + 3200)
-#define CCR2_HIGH	(CCR2_LOW + 3200)
-#define CCR3_HIGH	(CCR3_LOW + 3200)
-#define CCR4_HIGH	(CCR4_LOW + 3200)
+#define CCR1_RISE	(    0)
+#define CCR2_RISE	( 8000)
+#define CCR3_RISE	(16000)
+#define CCR4_RISE	(24000)
+#define CCR1_FALL	(CCR1_RISE + 3200)
+#define CCR2_FALL	(CCR2_RISE + 3200)
+#define CCR3_FALL	(CCR3_RISE + 3200)
+#define CCR4_FALL	(CCR4_RISE + 3200)
+
+#define IS_GPIO_PIN_HIGH(PORT, BIT)  ( ((PORT)->IDR & (0x1UL << (BIT))) == (0x1UL << (BIT)) )
+#define IS_GPIO_PIN_LOW(PORT, BIT)   ( ((PORT)->IDR & (0x1UL << (BIT))) == (0x0UL) )
 
 void show_regs(uint32_t base, uint32_t len);
 
