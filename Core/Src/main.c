@@ -94,12 +94,13 @@ int main(void)
 
   show_regs(TIM1_BASE, 0x68);
 
+  /* Enable Interrupts and Start TIM1 */
   TIM1->CCR1 = CCR1_LOW;
   TIM1->CCR2 = CCR2_LOW;
   TIM1->CCR3 = CCR3_LOW;
   TIM1->CCR4 = CCR4_LOW;
-
   TIM1->DIER = 0x000E;	/* Enable only CC1IE, CC2IE, CC3IE*/
+  TIM1->CCR1 = 0x0001;  /* start TIM1 */
 
   /* USER CODE END 2 */
 
@@ -130,12 +131,14 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSIDiv = RCC_HSI_DIV1;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
-  RCC_OscInitStruct.PLL.PLLN = 16;
+  RCC_OscInitStruct.PLL.PLLN = 8;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -156,18 +159,17 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCO2DIV_64);
+  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCO2DIV_1);
 }
 
 /* USER CODE BEGIN 4 */
 
 void show_regs(uint32_t base, uint32_t len)
 {
-	for (uint32_t reg = base; reg < (base+len); reg+=4)
+	for (uint32_t reg = base; reg <= (base+len); reg+=4)
 	{
 		uint32_t val = *((uint32_t*)reg);
-		printf("%08lX : %08lX\r\n", base, val);
-		base += 4;
+		printf("%08lX : %08lX\r\n", reg, val);
 	}
 }
 

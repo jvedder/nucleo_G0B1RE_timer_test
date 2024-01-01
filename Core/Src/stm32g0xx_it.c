@@ -149,30 +149,37 @@ void TIM1_CC_IRQHandler(void)
 
   if (TIM1->SR & TIM_SR_CC1IF)
   {
-	  /* toggle between 16,000 and 19,200 (0x3E80 & 0x4800) */
-	  TIM1->CCR1 ^= 0x7580;
-
+	  /* Toggle the timer value */
+	  TIM1->CCR1 = (TIM1->CCR1 == CCR1_LOW) ? CCR1_HIGH : CCR1_LOW;
 	  /* clear CC1IF */
 	  TIM1->SR = ~(TIM_SR_CC1IF);
   }
 
   if (TIM1->SR & TIM_SR_CC2IF)
   {
-	  /* toggle between 32,000 and 35,200 (0x7D00 & 0x8980) */
-	  TIM1->CCR2 ^= 0xF480;
-
+	  /* Toggle the timer value */
+	  TIM1->CCR2 = (TIM1->CCR2 == CCR2_LOW) ? CCR2_HIGH : CCR2_LOW;
 	  /* clear CC2IF */
 	  TIM1->SR = ~(TIM_SR_CC2IF);
   }
 
   if (TIM1->SR & TIM_SR_CC3IF)
   {
-	  /* toggle between 48,000 and 51,200 (0xBB80 & 0xC800) */
-	  TIM1->CCR3 ^= 0x7380;
-
+	  /* Toggle the timer value */
+	  TIM1->CCR3 = (TIM1->CCR3 == CCR3_LOW) ? CCR3_HIGH : CCR3_LOW;
 	  /* clear CC3IF */
 	  TIM1->SR = ~(TIM_SR_CC3IF);
   }
+
+#if 0
+  if (TIM1->SR & TIM_SR_CC4IF)
+  {
+	  /* Toggle the timer value */
+	  TIM1->CCR4 = (TIM1->CCR4 == CCR4_LOW) ? CCR4_HIGH : CCR4_LOW;
+	  /* clear CC4IF */
+	  TIM1->SR = ~(TIM_SR_CC4IF);
+  }
+#endif
 
   /* USER CODE END TIM1_CC_IRQn 0 */
   /* USER CODE BEGIN TIM1_CC_IRQn 1 */
