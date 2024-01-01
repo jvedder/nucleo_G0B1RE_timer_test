@@ -92,7 +92,7 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
-  show_regs(TIM1_BASE, 0x68);
+  // show_regs(TIM1_BASE, 0x68);
 
   /* Enable Interrupts and Start TIM1 */
   TIM1->CCR1 = CCR1_LOW;
