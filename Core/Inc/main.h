@@ -37,9 +37,6 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
-extern volatile uint32_t ccr4_rise_isr_time;
-extern volatile uint32_t ccr4_fall_isr_time;
-
 extern volatile uint32_t polarity_fault;
 
 /* USER CODE END ET */
@@ -89,6 +86,7 @@ void Error_Handler(void);
 #define TIM1_CH4_Pin  GPIO_PIN_11
 
 
+#define TIM1_PERIOD		(64000)
 #define TIM1_CCR1_RISE	(    0)
 #define TIM1_CCR2_RISE	( 8000)
 #define TIM1_CCR3_RISE	(16000)
@@ -97,6 +95,13 @@ void Error_Handler(void);
 #define TIM1_CCR2_FALL	(TIM1_CCR2_RISE + 3200)
 #define TIM1_CCR3_FALL	(TIM1_CCR3_RISE + 3200)
 #define TIM1_CCR4_FALL	(TIM1_CCR4_RISE + 3200)
+
+
+#define TIM1_CCR1_FAULT	(0x01)
+#define TIM1_CCR2_FAULT	(0x02)
+#define TIM1_CCR3_FAULT	(0x04)
+#define TIM1_CCR4_FAULT	(0x08)
+
 
 #define IS_GPIO_PIN_HIGH(PORT, PIN)  ( ((PORT)->IDR & (PIN)) == (PIN) )
 #define IS_GPIO_PIN_LOW(PORT, PIN)   ( ((PORT)->IDR & (PIN)) == (0x0UL) )

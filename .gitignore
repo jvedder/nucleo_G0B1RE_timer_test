@@ -8,9 +8,9 @@ Release/
 #ignore the debug launch 
 *.launch
 
-#ignore the Excel file
-bin_to_hex.xlsx
-~$bin_to_hex.xlsx
+#ignore the Excel files
+*.xlsx
+~$*.xlsx
 
 #ignore example files
 example*

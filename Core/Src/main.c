@@ -47,8 +47,6 @@
 
 /* USER CODE BEGIN PV */
 
-volatile uint32_t ccr4_rise_isr_time = 0;
-volatile uint32_t ccr4_fall_isr_time = 0;
 volatile uint32_t polarity_fault = 0;
 
 /* USER CODE END PV */
@@ -61,6 +59,77 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+/**
+  * @brief  Finish configuring, enable interrupts, and start TIM1.
+  * @retval none
+  */
+void TIM1_Start(void)
+{
+	/*
+	 * Configure TIM1
+	 */
+
+    /* enable TIM1 clock */
+    __HAL_RCC_TIM1_CLK_ENABLE();
+
+    /* TIM1 interrupt Init */
+    HAL_NVIC_SetPriority(TIM1_CC_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
+
+	/* Force a hard reset of TIM1 */
+	__HAL_RCC_TIM1_FORCE_RESET();
+	HAL_Delay(1);
+	__HAL_RCC_TIM1_RELEASE_RESET();
+
+	/* reset timer counter (not sure this is needed :-) */
+	TIM1->CNT = 0x0000;
+
+	/*set the timer period */
+	TIM1->ARR = TIM1_PERIOD;
+	TIM1->PSC = 1;
+	TIM1->RCR = 0;
+
+	/* Set Output Compare Toggle Mode for all 4 channels:
+	 *
+	 * OCxCE = 0: OCxRef is not affected by the ocref_clr_int signal
+	 * OCxM  = 0011: Toggle - OCxREF toggles when TIM_CNT=TIM_CCRx,
+	 * OCxPE = 0: Preload register on TIMx_CCRx disabled. TIMx_CCRx can be written at anytime.
+	 * OCxFE = 0: Output Compare fast enable is off
+	 * CCxS  = 00: CCx channel is configured as output
+	 **/
+	TIM1->CCMR1 = 0x3030;
+	TIM1->CCMR2 = 0x3030;
+
+	/* Set the initial strobe values */
+	TIM1->CCR1 = TIM1_CCR1_RISE;
+	TIM1->CCR2 = TIM1_CCR2_RISE;
+	TIM1->CCR3 = TIM1_CCR3_RISE;
+	TIM1->CCR4 = TIM1_CCR4_RISE;
+
+	/* Enable only CC1 thru CC4  interrupts  */
+	TIM1->DIER =  (TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE | TIM_DIER_CC4IE);
+
+	/* Enable only CC1 thru CC4 outputs */
+	TIM1->CCER = (TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E);
+
+	/* Enable Main Output Enable (MOE) and define off state on outputs  */
+	TIM1->BDTR = (TIM_BDTR_MOE | TIM_BDTR_OSSR | TIM_BDTR_OSSI);
+
+	/* Generate an update event to reload registers */
+	TIM1->EGR = TIM_EGR_UG;
+
+	/* Configure the TIM1 GPIOs */
+	TIM_HandleTypeDef htim1;
+	htim1.Instance = TIM1;
+	HAL_TIM_MspPostInit(&htim1);
+
+	/* Clear all prior interrupts (write 0 to clear)*/
+	TIM1->SR = 0x0000;
+
+	/* Start the timer as an upcount timer with auto-preload is not buffered */
+	TIM1->CR1 = TIM_CR1_CEN;
+}
 
 /* USER CODE END 0 */
 
@@ -93,36 +162,23 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  MX_TIM1_Init();
+  //MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
+
+  printf("\r\n\r\n** Booted **\r\n");
+  printf("Build: " __DATE__ ", " __TIME__ "\r\n");
 
   // show_regs(TIM1_BASE, 0x68);
 
-  /*
-   *  Finish TIM1 set-up
-   */
 
-  /* Set the initial strobe values */
-  TIM1->CCR1 = TIM1_CCR1_RISE;
-  TIM1->CCR2 = TIM1_CCR2_RISE;
-  TIM1->CCR3 = TIM1_CCR3_RISE;
-  TIM1->CCR4 = TIM1_CCR4_RISE;
-  /* Enable only CC1 thru CC4  interrupts  */
-  TIM1->DIER =  (TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE | TIM_DIER_CC4IE);
-  /* Enable only CC thru CC4 outputs */
-  TIM1->CCER = (TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E);
-  /* Set Main Output Enable (MOE) */
-  TIM1->BDTR |= TIM_BDTR_MOE;
-  /* Set Counter Enable -> start TIM1 */
-  TIM1->CR1  |= TIM_CR1_CEN;
-
+  /* Start TIM1 */
+  printf("Starting TIM1\r\n");
+  TIM1_Start();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint32_t max_isr_rise =0;
-  uint32_t max_isr_fall =0;
-  uint32_t temp;
+
   while (1)
   {
 	  /* light LED if faulted */
@@ -131,27 +187,16 @@ int main(void)
 		  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 	  }
 
-	  /* Note: ccr4_rise_isr_time and ccr4_fall_isr_time are volatile, so we
-	   * need to do an atomic read by taking a snapshot in temp.
-	   */
-	  temp = ccr4_rise_isr_time;
-	  if ( temp > max_isr_rise) max_isr_rise = temp;
-
-	  temp = ccr4_fall_isr_time;
-	  if ( temp > max_isr_fall) max_isr_fall = temp;
-
 #if 1
 	  /* if user button pressed */
 	  uint32_t btn = HAL_GPIO_ReadPin(BTN_USER_GPIO_Port, BTN_USER_Pin);
 	  if (btn == 0)
 	  {
-		  /* show TIM1 register values */
-		  //printf("TIM1\r\n");
-		  //show_regs(TIM1_BASE, 0x68);
-		  printf("max isr times  %4lX  %4lX\r\n", max_isr_rise, max_isr_fall);
-		  printf("faults %2lX\r\n", polarity_fault);
+		  printf("button pressed\r\n");
+		  printf("polarity_fault: %2lX\r\n", polarity_fault);
 		  printf("\r\n");
 
+          /* button switch debounce time */
 		  HAL_Delay(50);
 		  /* wait for button release */
 		  while (btn == 0)

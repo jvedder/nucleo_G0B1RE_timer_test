@@ -147,6 +147,8 @@ void TIM1_CC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_CC_IRQn 0 */
 
+  /* TODO: Parameterize this repetitive code */
+
   /* If CH1 caused the interrupt */
   if (TIM1->SR & TIM_SR_CC1IF)
   {
@@ -157,7 +159,10 @@ void TIM1_CC_IRQHandler(void)
 		  TIM1->CCR1 = TIM1_CCR1_FALL;
 
 		  /* fault if GPIO pin did not rise */
-		  if (IS_GPIO_PIN_LOW(TIM1_CH1_GPIO_Port, TIM1_CH1_Pin)) polarity_fault |= 0x01;
+		  if (IS_GPIO_PIN_LOW(TIM1_CH1_GPIO_Port, TIM1_CH1_Pin))
+		  {
+			  polarity_fault |= TIM1_CCR1_FAULT;
+		  }
 	  }
 	  else
 	  {
@@ -165,7 +170,10 @@ void TIM1_CC_IRQHandler(void)
 		  TIM1->CCR1 = TIM1_CCR1_RISE;
 
 		  /* fault if GPIO pin did not fall */
-		  if (IS_GPIO_PIN_HIGH(TIM1_CH1_GPIO_Port, TIM1_CH1_Pin)) polarity_fault |= 0x10;
+		  if (IS_GPIO_PIN_HIGH(TIM1_CH1_GPIO_Port, TIM1_CH1_Pin))
+		  {
+			  polarity_fault |= TIM1_CCR1_FAULT;
+		  }
 	  }
 	  /* clear CC1IF */
 	  TIM1->SR = ~(TIM_SR_CC1IF);
@@ -181,7 +189,10 @@ void TIM1_CC_IRQHandler(void)
 		  TIM1->CCR2 = TIM1_CCR2_FALL;
 
 		  /* fault if GPIO pin did not rise */
-		  if (IS_GPIO_PIN_LOW(TIM1_CH2_GPIO_Port, TIM1_CH2_Pin)) polarity_fault |= 0x02;
+		  if (IS_GPIO_PIN_LOW(TIM1_CH2_GPIO_Port, TIM1_CH2_Pin))
+		  {
+			  polarity_fault |= TIM1_CCR2_FAULT;
+		  }
 	  }
 	  else
 	  {
@@ -189,7 +200,10 @@ void TIM1_CC_IRQHandler(void)
 		  TIM1->CCR2 = TIM1_CCR2_RISE;
 
 		  /* fault if GPIO pin did not fall */
-		  if (IS_GPIO_PIN_HIGH(TIM1_CH2_GPIO_Port, TIM1_CH2_Pin)) polarity_fault |= 0x20;
+		  if (IS_GPIO_PIN_HIGH(TIM1_CH2_GPIO_Port, TIM1_CH2_Pin))
+		  {
+			  polarity_fault |= TIM1_CCR2_FAULT;
+		  }
 	  }
 	  /* clear CC2IF */
 	  TIM1->SR = ~(TIM_SR_CC2IF);
@@ -205,7 +219,10 @@ void TIM1_CC_IRQHandler(void)
 		  TIM1->CCR3 = TIM1_CCR3_FALL;
 
 		  /* fault if GPIO pin did not rise */
-		  if (IS_GPIO_PIN_LOW(TIM1_CH3_GPIO_Port, TIM1_CH3_Pin)) polarity_fault |= 0x04;
+		  if (IS_GPIO_PIN_LOW(TIM1_CH3_GPIO_Port, TIM1_CH3_Pin))
+		  {
+			  polarity_fault |= TIM1_CCR3_FAULT;
+		  }
 	  }
 	  else
 	  {
@@ -213,7 +230,10 @@ void TIM1_CC_IRQHandler(void)
 		  TIM1->CCR3 = TIM1_CCR3_RISE;
 
 		  /* fault if GPIO pin did not fall */
-		  if (IS_GPIO_PIN_HIGH(TIM1_CH3_GPIO_Port, TIM1_CH3_Pin)) polarity_fault |= 0x40;
+		  if (IS_GPIO_PIN_HIGH(TIM1_CH3_GPIO_Port, TIM1_CH3_Pin))
+		  {
+			  polarity_fault |= TIM1_CCR3_FAULT;
+		  }
 	  }
 	  /* clear CC3IF */
 	  TIM1->SR = ~(TIM_SR_CC3IF);
@@ -230,10 +250,11 @@ void TIM1_CC_IRQHandler(void)
 		  TIM1->CCR4 = TIM1_CCR4_FALL;
 
 		  /* fault if GPIO pin did not rise */
-		  if (IS_GPIO_PIN_LOW(TIM1_CH4_GPIO_Port, TIM1_CH4_Pin)) polarity_fault |= 0x08;
+		  if (IS_GPIO_PIN_LOW(TIM1_CH4_GPIO_Port, TIM1_CH4_Pin))
+	      {
+			  polarity_fault |= TIM1_CCR4_FAULT;
+	      }
 
-		  /* DEBUG: record how long this took */
-		  ccr4_rise_isr_time = TIM1->CNT;
 	  }
 	  else
 	  {
@@ -241,12 +262,11 @@ void TIM1_CC_IRQHandler(void)
 		  TIM1->CCR4 = TIM1_CCR4_RISE;
 
 		  /* fault if GPIO pin did not fall */
-		  if (IS_GPIO_PIN_HIGH(TIM1_CH4_GPIO_Port, TIM1_CH4_Pin)) polarity_fault |= 0x80;
-
-		  /* DEBUG: record how long this took */
-		  ccr4_fall_isr_time = TIM1->CNT;
+		  if (IS_GPIO_PIN_HIGH(TIM1_CH4_GPIO_Port, TIM1_CH4_Pin))
+		  {
+			  polarity_fault |= TIM1_CCR4_FAULT;
+		  }
 	  }
-
 	  /* clear CC4IF */
 	  TIM1->SR = ~(TIM_SR_CC4IF);
   }
