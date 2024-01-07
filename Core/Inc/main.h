@@ -38,6 +38,7 @@ extern "C" {
 /* USER CODE BEGIN ET */
 
 extern volatile uint32_t polarity_fault;
+extern volatile uint32_t tim1_running;
 
 /* USER CODE END ET */
 

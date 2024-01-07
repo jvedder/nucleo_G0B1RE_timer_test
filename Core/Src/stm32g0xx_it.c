@@ -147,7 +147,7 @@ void TIM1_CC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_CC_IRQn 0 */
 
-  /* TODO: Parameterize this repetitive code */
+  /* TODO: Maybe parameterize this ISR */
 
   /* If CH1 caused the interrupt */
   if (TIM1->SR & TIM_SR_CC1IF)
@@ -271,6 +271,7 @@ void TIM1_CC_IRQHandler(void)
 	  TIM1->SR = ~(TIM_SR_CC4IF);
   }
 
+  tim1_running = 1;
 
   /* USER CODE END TIM1_CC_IRQn 0 */
   /* USER CODE BEGIN TIM1_CC_IRQn 1 */

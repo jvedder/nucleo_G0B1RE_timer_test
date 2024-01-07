@@ -18,13 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "timer.h"
 
 /* USER CODE END Includes */
 
@@ -48,6 +48,7 @@
 /* USER CODE BEGIN PV */
 
 volatile uint32_t polarity_fault = 0;
+volatile uint32_t tim1_running = 0;
 
 /* USER CODE END PV */
 
@@ -64,72 +65,6 @@ void SystemClock_Config(void);
   * @brief  Finish configuring, enable interrupts, and start TIM1.
   * @retval none
   */
-void TIM1_Start(void)
-{
-	/*
-	 * Configure TIM1
-	 */
-
-    /* enable TIM1 clock */
-    __HAL_RCC_TIM1_CLK_ENABLE();
-
-    /* TIM1 interrupt Init */
-    HAL_NVIC_SetPriority(TIM1_CC_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
-
-	/* Force a hard reset of TIM1 */
-	__HAL_RCC_TIM1_FORCE_RESET();
-	HAL_Delay(1);
-	__HAL_RCC_TIM1_RELEASE_RESET();
-
-	/* reset timer counter (not sure this is needed :-) */
-	TIM1->CNT = 0x0000;
-
-	/*set the timer period */
-	TIM1->ARR = TIM1_PERIOD;
-	TIM1->PSC = 1;
-	TIM1->RCR = 0;
-
-	/* Set Output Compare Toggle Mode for all 4 channels:
-	 *
-	 * OCxCE = 0: OCxRef is not affected by the ocref_clr_int signal
-	 * OCxM  = 0011: Toggle - OCxREF toggles when TIM_CNT=TIM_CCRx,
-	 * OCxPE = 0: Preload register on TIMx_CCRx disabled. TIMx_CCRx can be written at anytime.
-	 * OCxFE = 0: Output Compare fast enable is off
-	 * CCxS  = 00: CCx channel is configured as output
-	 **/
-	TIM1->CCMR1 = 0x3030;
-	TIM1->CCMR2 = 0x3030;
-
-	/* Set the initial strobe values */
-	TIM1->CCR1 = TIM1_CCR1_RISE;
-	TIM1->CCR2 = TIM1_CCR2_RISE;
-	TIM1->CCR3 = TIM1_CCR3_RISE;
-	TIM1->CCR4 = TIM1_CCR4_RISE;
-
-	/* Enable only CC1 thru CC4  interrupts  */
-	TIM1->DIER =  (TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE | TIM_DIER_CC4IE);
-
-	/* Enable only CC1 thru CC4 outputs */
-	TIM1->CCER = (TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E);
-
-	/* Enable Main Output Enable (MOE) and define off state on outputs  */
-	TIM1->BDTR = (TIM_BDTR_MOE | TIM_BDTR_OSSR | TIM_BDTR_OSSI);
-
-	/* Generate an update event to reload registers */
-	TIM1->EGR = TIM_EGR_UG;
-
-	/* Configure the TIM1 GPIOs */
-	TIM_HandleTypeDef htim1;
-	htim1.Instance = TIM1;
-	HAL_TIM_MspPostInit(&htim1);
-
-	/* Clear all prior interrupts (write 0 to clear)*/
-	TIM1->SR = 0x0000;
-
-	/* Start the timer as an upcount timer with auto-preload is not buffered */
-	TIM1->CR1 = TIM_CR1_CEN;
-}
 
 /* USER CODE END 0 */
 
@@ -168,12 +103,9 @@ int main(void)
   printf("\r\n\r\n** Booted **\r\n");
   printf("Build: " __DATE__ ", " __TIME__ "\r\n");
 
-  // show_regs(TIM1_BASE, 0x68);
-
-
   /* Start TIM1 */
   printf("Starting TIM1\r\n");
-  TIM1_Start();
+  TIM1_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -187,13 +119,22 @@ int main(void)
 		  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
 	  }
 
-#if 1
+	  /* verify TIM1 is running */
+	  tim1_running = 0;
+	  HAL_Delay(3);
+	  if (tim1_running == 0)
+	  {
+	      /* light LED if not running */
+	      HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+	  }
+
 	  /* if user button pressed */
 	  uint32_t btn = HAL_GPIO_ReadPin(BTN_USER_GPIO_Port, BTN_USER_Pin);
 	  if (btn == 0)
 	  {
 		  printf("button pressed\r\n");
 		  printf("polarity_fault: %2lX\r\n", polarity_fault);
+		  printf("tim1_running: %ld\r\n", tim1_running);
 		  printf("\r\n");
 
           /* button switch debounce time */
@@ -204,7 +145,7 @@ int main(void)
 			  btn = HAL_GPIO_ReadPin(BTN_USER_GPIO_Port, BTN_USER_Pin);
 		  }
 	  }
-#endif
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -261,6 +202,7 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+#if 0
 void show_regs(uint32_t base, uint32_t len)
 {
 	for (uint32_t reg = base; reg <= (base+len); reg+=4)
@@ -269,6 +211,7 @@ void show_regs(uint32_t base, uint32_t len)
 		printf("%08lX : %08lX\r\n", reg, val);
 	}
 }
+#endif
 
 /**
  * Override this from syscalls.c -- printf() goes to the UART2
