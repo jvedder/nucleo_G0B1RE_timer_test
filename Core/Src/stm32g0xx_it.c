@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -146,132 +146,6 @@ void SysTick_Handler(void)
 void TIM1_CC_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_CC_IRQn 0 */
-
-  /* TODO: Maybe parameterize this ISR */
-
-  /* If CH1 caused the interrupt */
-  if (TIM1->SR & TIM_SR_CC1IF)
-  {
-	  /* toggle the timer value */
-	  if (TIM1->CCR1 == TIM1_CCR1_RISE)
-	  {
-		  /* set up the falling edge time */
-		  TIM1->CCR1 = TIM1_CCR1_FALL;
-
-		  /* fault if GPIO pin did not rise */
-		  if (IS_GPIO_PIN_LOW(TIM1_CH1_GPIO_Port, TIM1_CH1_Pin))
-		  {
-			  polarity_fault |= TIM1_CCR1_FAULT;
-		  }
-	  }
-	  else
-	  {
-		  /* set up the rising edge time */
-		  TIM1->CCR1 = TIM1_CCR1_RISE;
-
-		  /* fault if GPIO pin did not fall */
-		  if (IS_GPIO_PIN_HIGH(TIM1_CH1_GPIO_Port, TIM1_CH1_Pin))
-		  {
-			  polarity_fault |= TIM1_CCR1_FAULT;
-		  }
-	  }
-	  /* clear CC1IF */
-	  TIM1->SR = ~(TIM_SR_CC1IF);
-  }
-
-  /* If CH2 caused the interrupt */
-  if (TIM1->SR & TIM_SR_CC2IF)
-  {
-	  /* toggle the timer value */
-	  if (TIM1->CCR2 == TIM1_CCR2_RISE)
-	  {
-		  /* set up the falling edge time */
-		  TIM1->CCR2 = TIM1_CCR2_FALL;
-
-		  /* fault if GPIO pin did not rise */
-		  if (IS_GPIO_PIN_LOW(TIM1_CH2_GPIO_Port, TIM1_CH2_Pin))
-		  {
-			  polarity_fault |= TIM1_CCR2_FAULT;
-		  }
-	  }
-	  else
-	  {
-		  /* set up the rising edge time */
-		  TIM1->CCR2 = TIM1_CCR2_RISE;
-
-		  /* fault if GPIO pin did not fall */
-		  if (IS_GPIO_PIN_HIGH(TIM1_CH2_GPIO_Port, TIM1_CH2_Pin))
-		  {
-			  polarity_fault |= TIM1_CCR2_FAULT;
-		  }
-	  }
-	  /* clear CC2IF */
-	  TIM1->SR = ~(TIM_SR_CC2IF);
-  }
-
-  /* If CH3 caused the interrupt */
-  if (TIM1->SR & TIM_SR_CC3IF)
-  {
-	  /* toggle the timer value */
-	  if (TIM1->CCR3 == TIM1_CCR3_RISE)
-	  {
-		  /* set up the falling edge time */
-		  TIM1->CCR3 = TIM1_CCR3_FALL;
-
-		  /* fault if GPIO pin did not rise */
-		  if (IS_GPIO_PIN_LOW(TIM1_CH3_GPIO_Port, TIM1_CH3_Pin))
-		  {
-			  polarity_fault |= TIM1_CCR3_FAULT;
-		  }
-	  }
-	  else
-	  {
-		  /* set up the rising edge time */
-		  TIM1->CCR3 = TIM1_CCR3_RISE;
-
-		  /* fault if GPIO pin did not fall */
-		  if (IS_GPIO_PIN_HIGH(TIM1_CH3_GPIO_Port, TIM1_CH3_Pin))
-		  {
-			  polarity_fault |= TIM1_CCR3_FAULT;
-		  }
-	  }
-	  /* clear CC3IF */
-	  TIM1->SR = ~(TIM_SR_CC3IF);
-  }
-
-  /* If CH4 caused the interrupt */
-  if (TIM1->SR & TIM_SR_CC4IF)
-  {
-	  /* Toggle the timer value */
-	  /* toggle the timer value */
-	  if (TIM1->CCR4 == TIM1_CCR4_RISE)
-	  {
-		  /* set up the falling edge time */
-		  TIM1->CCR4 = TIM1_CCR4_FALL;
-
-		  /* fault if GPIO pin did not rise */
-		  if (IS_GPIO_PIN_LOW(TIM1_CH4_GPIO_Port, TIM1_CH4_Pin))
-	      {
-			  polarity_fault |= TIM1_CCR4_FAULT;
-	      }
-
-	  }
-	  else
-	  {
-		  /* set up the rising edge time */
-		  TIM1->CCR4 = TIM1_CCR4_RISE;
-
-		  /* fault if GPIO pin did not fall */
-		  if (IS_GPIO_PIN_HIGH(TIM1_CH4_GPIO_Port, TIM1_CH4_Pin))
-		  {
-			  polarity_fault |= TIM1_CCR4_FAULT;
-		  }
-	  }
-	  /* clear CC4IF */
-	  TIM1->SR = ~(TIM_SR_CC4IF);
-  }
-
-  tim1_running = 1;
 
   /* USER CODE END TIM1_CC_IRQn 0 */
   /* USER CODE BEGIN TIM1_CC_IRQn 1 */

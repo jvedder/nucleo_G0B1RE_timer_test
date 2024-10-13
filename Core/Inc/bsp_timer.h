@@ -1,15 +1,15 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    tim.h
+  * @file    bsp_timer.h
   * @brief   This file contains all the function prototypes for
   *          the tim.c file
   ******************************************************************************
   */
 
 /* Define to prevent recursive inclusion */
-#ifndef __TIMER_H__
-#define __TIMER_H__
+#ifndef __BSP_TIMER_H__
+#define __BSP_TIMER_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,8 +18,8 @@ extern "C" {
 /* Includes */
 #include "main.h"
 
-void TIM1_Init(void);
-void TIM1_GPIO_Init(void);
+void BSP_TIM1_Init(void);
+void BSP_TIM2_Init(void);
 
 
 
@@ -27,5 +27,5 @@ void TIM1_GPIO_Init(void);
 }
 #endif
 
-#endif /* __TIMER_H__ */
+#endif /* __BSP_TIMER_H__ */
 

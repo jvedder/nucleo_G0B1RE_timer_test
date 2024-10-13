@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -18,13 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "timer.h"
+#include "bsp_timer.h"
 
 /* USER CODE END Includes */
 
@@ -47,9 +48,6 @@
 
 /* USER CODE BEGIN PV */
 
-volatile uint32_t polarity_fault = 0;
-volatile uint32_t tim1_running = 0;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,11 +58,6 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-/**
-  * @brief  Finish configuring, enable interrupts, and start TIM1.
-  * @retval none
-  */
 
 /* USER CODE END 0 */
 
@@ -98,54 +91,57 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   //MX_TIM1_Init();
+  BSP_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
-  printf("\r\n\r\n** Booted **\r\n");
-  printf("Build: " __DATE__ ", " __TIME__ "\r\n");
+  printf("\r\nBooted " __DATE__ ", " __TIME__ "\r\n");
 
-  /* Start TIM1 */
-  printf("Starting TIM1\r\n");
-  TIM1_Init();
+#if 0
+
+  /* Set Capture/Compare 1 output enable for all 4 channels */
+  TIM1->CCER = 0x1111;
+  /* Set the initial strobe positions */
+  TIM1->CCR1 = 1;
+  TIM1->CCR2 = 2;
+  TIM1->CCR3 = 3;
+  TIM1->CCR4 = 4;
+#endif
+
+  if(HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
+  {
+      Error_Handler();
+  }
+
+#if 0
+  if(HAL_TIM_Base_Start_IT(&htim1) != HAL_OK)
+  {
+      Error_Handler();
+  }
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
+  uint16_t last1 = 0;
+  uint16_t last2 = 0;
+  uint16_t cnt = 0;
   while (1)
   {
-	  /* light LED if faulted */
-	  if (polarity_fault)
-	  {
-		  HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
-	  }
+      cnt = TIM1->CNT;
+      if (cnt != last1 )
+      {
+          printf("TIM1: %04x\r\n", cnt);
+          last1 = cnt;
+      }
 
-	  /* verify TIM1 is running */
-	  tim1_running = 0;
-	  HAL_Delay(3);
-	  if (tim1_running == 0)
-	  {
-	      /* light LED if not running */
-	      HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
-	  }
-
-	  /* if user button pressed */
-	  uint32_t btn = HAL_GPIO_ReadPin(BTN_USER_GPIO_Port, BTN_USER_Pin);
-	  if (btn == 0)
-	  {
-		  printf("button pressed\r\n");
-		  printf("polarity_fault: %2lX\r\n", polarity_fault);
-		  printf("tim1_running: %ld\r\n", tim1_running);
-		  printf("\r\n");
-
-          /* button switch debounce time */
-		  HAL_Delay(50);
-		  /* wait for button release */
-		  while (btn == 0)
-		  {
-			  btn = HAL_GPIO_ReadPin(BTN_USER_GPIO_Port, BTN_USER_Pin);
-		  }
-	  }
-
+      cnt = TIM2->CNT;
+      if (cnt != last2 )
+      {
+//          printf("TIM2: %04x\r\n", cnt);
+          last2 = cnt;
+      }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -201,17 +197,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-#if 0
-void show_regs(uint32_t base, uint32_t len)
-{
-	for (uint32_t reg = base; reg <= (base+len); reg+=4)
-	{
-		uint32_t val = *((uint32_t*)reg);
-		printf("%08lX : %08lX\r\n", reg, val);
-	}
-}
-#endif
 
 /**
  * Override this from syscalls.c -- printf() goes to the UART2
