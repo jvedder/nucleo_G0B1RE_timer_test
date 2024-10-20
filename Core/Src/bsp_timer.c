@@ -33,7 +33,6 @@ void BSP_TIM1_Init( void )
     /* TIM1 interrupt Init */
     //HAL_NVIC_SetPriority( TIM1_CC_IRQn, 0, 0 );
     //HAL_NVIC_EnableIRQ( TIM1_CC_IRQn );
-
     /* Force a hard reset of TIM1 */
     __HAL_RCC_TIM1_FORCE_RESET( );
     HAL_Delay( 1 );
@@ -49,9 +48,9 @@ void BSP_TIM1_Init( void )
     TIM1->SMCR = 0x17;
 
     /*set the timer period */
-    TIM1->ARR = 5; // period
-    TIM1->PSC = 0; // Prescaler -1 
-    TIM1->RCR = 0; // repetition counter
+    TIM1->ARR = 5;  // period
+    TIM1->PSC = 0;  // Prescaler -1
+    TIM1->RCR = 0;  // repetition counter
 
     /* Set Output Compare Toggle Mode for all 4 channels:
      *
@@ -66,14 +65,16 @@ void BSP_TIM1_Init( void )
      * OCxFE = 0: Output Compare fast enable is off
      * CCxS  = 00: CCx channel is configured as output
      **/
-    TIM1->CCMR1 = (TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_0) | (TIM_CCMR1_OC2M_2 | TIM_CCMR1_OC2M_1);
-    TIM1->CCMR2 = (TIM_CCMR2_OC3M_3 | TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_0) | (TIM_CCMR2_OC4M_2 | TIM_CCMR2_OC4M_1);
+    TIM1->CCMR1 = ( TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_0 )
+            | ( TIM_CCMR1_OC2M_2 | TIM_CCMR1_OC2M_1 );
+    TIM1->CCMR2 = ( TIM_CCMR2_OC3M_3 | TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_0 )
+            | ( TIM_CCMR2_OC4M_2 | TIM_CCMR2_OC4M_1 );
 
     /* Set the initial strobe positions */
-    TIM1->CCR1 = 1; //TIM1_CCR1_RISE;
-    TIM1->CCR2 = 2; //TIM1_CCR2_RISE;
-    TIM1->CCR3 = 3; //TIM1_CCR3_RISE;
-    TIM1->CCR4 = 4; //TIM1_CCR4_RISE;
+    TIM1->CCR1 = 1;  //TIM1_CCR1_RISE;
+    TIM1->CCR2 = 2;  //TIM1_CCR2_RISE;
+    TIM1->CCR3 = 3;  //TIM1_CCR3_RISE;
+    TIM1->CCR4 = 4;  //TIM1_CCR4_RISE;
 
     /* Disable  interrupts  */
     TIM1->DIER = 0x0;
@@ -116,51 +117,59 @@ void BSP_TIM2_Init( void )
     HAL_NVIC_EnableIRQ( TIM2_IRQn );
 
     /* reset timer counter (not sure this is needed :-) */
-       TIM2->CNT = 0x0000;
+    TIM2->CNT = 0x0000;
 
-       /*set the timer period */
-       TIM2->ARR = TIM2_PERIOD;
-       TIM2->PSC = TIM2_PRESCALER - 1;
-       TIM2->RCR = 0;
+    /*set the timer period */
+    TIM2->ARR = 64000000;  // Persiod = 1 sec witrh 64 MHz CLock
+    TIM2->PSC = 0;  // PRESCALER = 1;
+    TIM2->RCR = 0;
 
-       /* Set Output Compare Toggle Mode for all 4 channels:
-        *
-        * OCxCE = 0: OCxRef is not affected by the ocref_clr_int signal
-        * OCxM  = 0000: Frozen TIM_CNT = TIM_CCRx has no effect on outputs.
-        * OCxPE = 0: Preload register on TIMx_CCRx disabled. TIMx_CCRx can be written at anytime.
-        * OCxFE = 0: Output Compare fast enable is off
-        * CCxS  = 00: CCx channel is configured as output
-        **/
-       TIM2->CCMR1 = 0x0000; // 0x3030;
-       TIM2->CCMR2 = 0x0000; // 0x3030;
+    /* Set Output Compare Toggle Mode for all 4 channels:
+     *
+     * OCxCE = 0: OCxRef is not affected by the ocref_clr_int signal
+     * OCxM  = 0000: Frozen TIM_CNT = TIM_CCRx has no effect on outputs.
+     * OCxPE = 0: Preload register on TIMx_CCRx disabled. TIMx_CCRx can be written at anytime.
+     * OCxFE = 0: Output Compare fast enable is off
+     * CCxS  = 00: CCx channel is configured as output
+     **/
+    TIM2->CCMR1 = 0x0000;
+    TIM2->CCMR2 = 0x0000;
 
-       /* Set the toggle positions */
-       TIM2->CCR1 = TIM2_CCR1_TOGGLE;
-       TIM2->CCR2 = TIM2_CCR2_TOGGLE;
-       TIM2->CCR3 = TIM2_CCR3_TOGGLE;
-       TIM2->CCR4 = TIM2_CCR4_TOGGLE;
+    /* Set the toggle positions */
+    TIM2->CCR1 = TIM2_CCR1_TOGGLE;
+    TIM2->CCR2 = TIM2_CCR2_TOGGLE;
+    TIM2->CCR3 = TIM2_CCR3_TOGGLE;
+    TIM2->CCR4 = TIM2_CCR4_TOGGLE;
 
-       /* Enable CC1 thru CC4  interrupts  */
-       TIM2->DIER = ( TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE
-               | TIM_DIER_CC4IE );
+    /* Enable CC1 thru CC4  interrupts  */
+    TIM2->DIER = ( TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE
+            | TIM_DIER_CC4IE );
 
-       /* Disable CC1 thru CC4 outputs */
-       TIM2->CCER = 0x0000;
+    /* Disable CC1 thru CC4 outputs */
+    TIM2->CCER = 0x0000;
 
-       /* Enable Main Output Enable (MOE) and define off state on outputs  */
-       TIM2->BDTR = ( TIM_BDTR_MOE | TIM_BDTR_OSSR | TIM_BDTR_OSSI );
+    /* Enable Main Output Enable (MOE) and define off state on outputs  */
+    TIM2->BDTR = ( TIM_BDTR_MOE | TIM_BDTR_OSSR | TIM_BDTR_OSSI );
 
-       /* Generate an update event to reload registers now */
-       TIM2->EGR = TIM_EGR_UG;
+    /* Generate an update event to reload registers now */
+    TIM2->EGR = TIM_EGR_UG;
 
-       /* Configure the GPIOs */
-       TIM2_GPIO_Init( );
+    /* Configure the GPIOs */
+    TIM2_GPIO_Init( );
 
-       /* Clear all prior interrupts (write 0 to clear) */
-       TIM2->SR = 0x0000;
+    /* Clear all prior interrupts (write 0 to clear) */
+    TIM2->SR = 0x0000;
 
-       /* Start the timer as an up count timer with auto-preload is not buffered */
-       TIM2->CR1 = TIM_CR1_CEN;
+    /*
+     * Set the Master Mode Selection  MMS[2:0]:
+     * MMS[2:0] = 010: Update - The update event is selected as trigger
+     * output (TRGO). For instance a master timer can then be used as a
+     * prescaler for a slave timer.
+     */
+    TIM2->CR2 = 0x20;
+
+    /* Start the timer as an up count timer with auto-preload is not buffered */
+    TIM2->CR1 = TIM_CR1_CEN;
 }
 
 /* Configures the TIM1 GPIO outputs */
@@ -173,7 +182,8 @@ void TIM1_GPIO_Init( void )
      * PB6  = TIM1_CH3
      * PC11 = TIM1_CH4
      */
-    GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+    GPIO_InitTypeDef GPIO_InitStruct =
+    { 0 };
     __HAL_RCC_GPIOA_CLK_ENABLE( );
     __HAL_RCC_GPIOB_CLK_ENABLE( );
 
@@ -197,18 +207,21 @@ void TIM1_GPIO_Init( void )
 /* Configures the TIM2 GPIO outputs */
 void TIM2_GPIO_Init( void )
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitTypeDef GPIO_InitStruct =
+    { 0 };
 
     /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE( );
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOB, TIM2_CHA_Pin|TIM2_CHB_Pin|TIM2_CHC_Pin|TIM2_CHD_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin( GPIOB,
+    TIM2_CHA_Pin | TIM2_CHB_Pin | TIM2_CHC_Pin | TIM2_CHD_Pin, GPIO_PIN_RESET );
 
     /* TIM2_CHA, TIM2_CHB, TIM2_CHC, TIM2_CHD = PB2, PB3, PB4, PB5 */
-    GPIO_InitStruct.Pin = TIM2_CHA_Pin|TIM2_CHB_Pin|TIM2_CHC_Pin|TIM2_CHD_Pin;
+    GPIO_InitStruct.Pin = TIM2_CHA_Pin | TIM2_CHB_Pin | TIM2_CHC_Pin
+            | TIM2_CHD_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_GPIO_Init( GPIOB, &GPIO_InitStruct );
 }
