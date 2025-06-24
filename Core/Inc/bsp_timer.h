@@ -18,9 +18,8 @@ extern "C" {
 /* Includes */
 #include "main.h"
 
-void BSP_TIM1_Init(void);
-void BSP_TIM2_Init(void);
-
+void BSP_Timer_Init(void);
+void BSP_Timer_Start(void);
 
 
 #ifdef __cplusplus

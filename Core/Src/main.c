@@ -18,14 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
 #include "bsp_timer.h"
+#include <stdio.h>
 
 /* USER CODE END Includes */
 
@@ -90,10 +89,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  //MX_TIM1_Init();
-  BSP_TIM1_Init();
-  //MX_TIM2_Init();
-  BSP_TIM2_Init();
+  BSP_Timer_Init();
+
   /* USER CODE BEGIN 2 */
 
   printf("\r\nBooted " __DATE__ ", " __TIME__ "\r\n");
@@ -109,40 +106,15 @@ int main(void)
   TIM1->CCR4 = 4;
 #endif
 
-  if(HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
-  {
-      Error_Handler();
-  }
+  BSP_Timer_Start();
 
-#if 0
-  if(HAL_TIM_Base_Start_IT(&htim1) != HAL_OK)
-  {
-      Error_Handler();
-  }
-#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  uint16_t last1 = 0;
-  uint16_t last2 = 0;
-  uint16_t cnt = 0;
   while (1)
   {
-      cnt = TIM1->CNT;
-      if (cnt != last1 )
-      {
-          printf("TIM1: %04x\r\n", cnt);
-          last1 = cnt;
-      }
-
-      cnt = TIM2->CNT;
-      if (cnt != last2 )
-      {
-//          printf("TIM2: %04x\r\n", cnt);
-          last2 = cnt;
-      }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -174,7 +146,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
   RCC_OscInitStruct.PLL.PLLN = 8;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -194,7 +166,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  HAL_RCC_MCOConfig(RCC_MCO2, RCC_MCO2SOURCE_SYSCLK, RCC_MCO2DIV_64);
+  HAL_RCC_MCOConfig(RCC_MCO_PA15, RCC_MCO2SOURCE_SYSCLK, RCC_MCO2DIV_64);
 }
 
 /* USER CODE BEGIN 4 */
