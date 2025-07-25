@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dac.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -66,6 +67,7 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -89,24 +91,32 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+
+  printf("\r\n\r\n** Booted **\r\n");
+  printf("Main.c built: " __DATE__ ", " __TIME__ "\r\n");
+
   BSP_Timer_Init();
+  MX_DAC1_Init();
 
   /* USER CODE BEGIN 2 */
 
-  printf("\r\nBooted " __DATE__ ", " __TIME__ "\r\n");
+  printf("Init complete\r\n");
 
-#if 0
+  HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
+  HAL_DAC_Start(&hdac1, DAC_CHANNEL_2);
 
-  /* Set Capture/Compare 1 output enable for all 4 channels */
-  TIM1->CCER = 0x1111;
-  /* Set the initial strobe positions */
-  TIM1->CCR1 = 1;
-  TIM1->CCR2 = 2;
-  TIM1->CCR3 = 3;
-  TIM1->CCR4 = 4;
-#endif
+  uint32_t dac1_value = 930;  // IR:  0.750V / 3.3V * 4096 LSB
+  uint32_t dac2_value = 124;  // Red: 0.100V / 3.3V * 4096 LSB
+  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, dac1_value);
+  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_2, DAC_ALIGN_12B_R, dac2_value);
+
+  printf("DAC1: %2ld\r\n", dac1_value);
+  printf("DAC2: %2ld\r\n", dac2_value);
 
   BSP_Timer_Start();
+
+
+  printf("Started\r\n");
 
   /* USER CODE END 2 */
 

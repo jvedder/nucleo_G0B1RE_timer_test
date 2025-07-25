@@ -8,6 +8,7 @@
  */
 /* Includes */
 #include "bsp_timer.h"
+#include <stdio.h>
 
 /**
  *  Defines
@@ -120,6 +121,24 @@ void BSP_Timer_Start( void )
 
     /* Start the master timer. The Slaves should start synchronously */
     TIM2->CR1 = TIM_CR1_CEN;
+}
+
+/**
+ * @brief  Displays the current strobe on/off timer values to
+ * the console using printf.
+ *
+ * @retval none
+ */
+void BSP_Show_Values( void )
+{
+    printf("Strobe1: %5d / %5d\r\n", TIM_STROBE1_ON, TIM_STROBE1_OFF);
+    printf("Strobe2: %5d / %5d\r\n", TIM_STROBE2_ON, TIM_STROBE2_OFF);
+    printf("Strobe3: %5d / %5d\r\n", TIM_STROBE3_ON, TIM_STROBE3_OFF);
+    printf("Strobe4: %5d / %5d\r\n", TIM_STROBE4_ON, TIM_STROBE4_OFF);
+    printf("Strobe5: %5d / %5d\r\n", TIM_STROBE5_ON, TIM_STROBE5_OFF);
+    printf("Strobe6: %5d / %5d\r\n", TIM_STROBE6_ON, TIM_STROBE6_OFF);
+    printf("Strobe7: %5d / %5d\r\n", TIM_STROBE7_ON, TIM_STROBE7_OFF);
+    printf("Strobe8: %5d / %5d\r\n", TIM_STROBE8_ON, TIM_STROBE8_OFF);
 }
 
 /*

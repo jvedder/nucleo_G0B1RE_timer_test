@@ -20,6 +20,7 @@ extern "C" {
 
 void BSP_Timer_Init(void);
 void BSP_Timer_Start(void);
+void BSP_Show_Values( void );
 
 
 #ifdef __cplusplus
