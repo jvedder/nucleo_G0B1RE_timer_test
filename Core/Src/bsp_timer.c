@@ -27,7 +27,7 @@
 #define TIM_STROBE3_ON  (2500u)
 #define TIM_STROBE4_ON  (3500u)
 
-#define TIM_STROBE5_ON  (   0u)
+#define TIM_STROBE5_ON  (   1u)
 #define TIM_STROBE6_ON  ( 667u)
 #define TIM_STROBE7_ON  (1333u)
 #define TIM_STROBE8_ON  (2000u)
@@ -103,6 +103,8 @@ void BSP_Timer_Init( void )
     Timer_Init( TIM15, SINGLE );
     TIM15->CCR1 = TIM_STROBE8_ON;
     TIM15->CCR2 = TIM_STROBE8_OFF;
+
+    Timer_GPIO_Init();
 }
 
 /**
@@ -151,7 +153,7 @@ static void Timer_Init( TIM_TypeDef *tim, OutputCount_t out )
 {
     /* CNT: Counter Register */
     tim->CNT = 0x0000;
-
+#if 0
     /* TIM2 is master and the other 4 are slaves that start with TIM2 Enable. */
     if ( tim == TIM2 )
     {
@@ -181,6 +183,11 @@ static void Timer_Init( TIM_TypeDef *tim, OutputCount_t out )
         tim->SMCR = ( 0b0111 << TIM_SMCR_SMS_Pos )
                 | ( 0b00001 << TIM_SMCR_TS_Pos );
     }
+#else
+    tim->CCR2 = 0x0000;
+    tim->SMCR = 0x0000;
+#endif
+
 
     /* Timer period */
     /* The APB clock for the timers (TPCLK) is 64 MHz. */
@@ -193,17 +200,16 @@ static void Timer_Init( TIM_TypeDef *tim, OutputCount_t out )
     /* Set Output Compare Mode for CH1 as rise on CCR1 and fall on CCR2 */
     /* OC1M  = 1101: Combined PWM mode 2 */
     /* OC2M  = 0110: PWM mode 1 */
-    tim->CCMR1 = ( 0b1101 << TIM_CCMR1_OC1M_Pos )
-            | ( 0b0110 << TIM_CCMR1_OC2M_Pos );
-
+    tim->CCMR1 = ( TIM_CCMR1_OC1M_3 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_0 )
+            | ( TIM_CCMR1_OC2M_2 | TIM_CCMR1_OC2M_1 );
     if ( out == DUAL )
     {
         /* CCMR2: Capture/Compare Mode Register 2 */
         /* Set Output Compare Mode for CH3 as rise on CCR1 and fall on CCR4 */
         /* OC3M  = 1101: Combined PWM mode 2 */
         /* OC4M  = 0110: PWM mode 1 */
-        tim->CCMR2 = ( 0b1101 << TIM_CCMR2_OC3M_Pos )
-                | ( 0b0110 << TIM_CCMR2_OC3M_Pos );
+        tim->CCMR2 = ( TIM_CCMR2_OC3M_3 | TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_0 )
+                | ( TIM_CCMR2_OC4M_2 | TIM_CCMR2_OC4M_1 );
     }
     else
     {
@@ -247,7 +253,7 @@ static void Timer_Init( TIM_TypeDef *tim, OutputCount_t out )
     tim->SR = 0x0000;
 
     /* Start the timer as an up count timer with auto-preload is not buffered */
-    tim->CR1 = TIM_CR1_CEN;
+    //tim->CR1 = TIM_CR1_CEN;
 }
 
 /**
@@ -298,13 +304,13 @@ static void Timer_GPIO_Init( void )
     GPIO_InitStruct.Alternate = GPIO_AF2_TIM2;
     HAL_GPIO_Init( GPIOB, &GPIO_InitStruct );
 
-    /* PA4 = STB5_TIM3_CH1, PA0 = STB6_TIM3_CH3 */
+    /* PB4 = STB5_TIM3_CH1, PB0 = STB6_TIM3_CH3 */
     GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_0;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM3;
-    HAL_GPIO_Init( GPIOA, &GPIO_InitStruct );
+    HAL_GPIO_Init( GPIOB, &GPIO_InitStruct );
 
     /* PB6 = STB7_TIM4_CH1 */
     GPIO_InitStruct.Pin = GPIO_PIN_6;
