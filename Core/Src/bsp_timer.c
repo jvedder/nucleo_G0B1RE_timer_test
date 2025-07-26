@@ -131,6 +131,8 @@ void BSP_Timer_Start( void )
  */
 void BSP_Show_Values( void )
 {
+    printf("Prescaler: %d => %d MHz\r\n",TIM_PRESCALER, 64/TIM_PRESCALER);
+    printf("Period   : %d\r\n", TIM_PERIOD);
     printf("Strobe1: %5d / %5d\r\n", TIM_STROBE1_ON, TIM_STROBE1_OFF);
     printf("Strobe2: %5d / %5d\r\n", TIM_STROBE2_ON, TIM_STROBE2_OFF);
     printf("Strobe3: %5d / %5d\r\n", TIM_STROBE3_ON, TIM_STROBE3_OFF);

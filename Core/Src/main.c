@@ -113,8 +113,9 @@ int main(void)
   printf("DAC1: %2ld\r\n", dac1_value);
   printf("DAC2: %2ld\r\n", dac2_value);
 
-  BSP_Timer_Start();
+  BSP_Show_Values();
 
+  BSP_Timer_Start();
 
   printf("Started\r\n");
 
